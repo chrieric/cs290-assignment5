@@ -4,13 +4,15 @@ ob_start();
 error_reporting(E_ALL);
 ini_set('display_errors',1);
 header('Content-Type: text/plain');
+
+
+
  
 $mysqli=new mysqli('oniddb.cws.oregonstate.edu','chrieric-db','temp','chrieric-db');
 if(!$mysqli||$mysqli->connect_errno)
 {
   echo 'Connection error' . $mysqli->connect_errno . '' . $mysqli->connect_error;
-}
- 
+} 
  
 function addMovie(array)
 {
@@ -27,7 +29,7 @@ function addMovie(array)
           include button creation here as well?*/
           
           if(!$stmt=$mysqli->prepare("INSERT INTO video_store_inventory (name, category, length)
-          VALUES (?,?,?);"))
+          VALUES (?,?,?)"))
           {
             echo 'Prep failed: (' . $mysqli->errno . ') ' . $mysqli->error
           }
@@ -74,7 +76,7 @@ function deleteMovie(array)
   
   if($name!=null)
   {
-    if(!$stmt=$mysqli->prepare("DELETE FROM video_store_inventory WHERE (id = ?)))
+    if(!$stmt=$mysqli->prepare("DELETE FROM video_store_inventory WHERE (id = ?)"))
    {
       echo 'Prep failed: (' . $mysqli->errno . ') ' . $mysqli->error
     }
@@ -105,11 +107,32 @@ function deleteMovie(array)
  
 function deleteAll(array)
 {
-  if(!$stmt=$mysqli->prepare("DELETE FROM video_store_inventory))
-   {
-      echo 'Prep failed: (' . $mysqli->errno . ') ' . $mysqli->error
+	if(!$stmt=$mysqli->prepare("DELETE FROM video_store_inventory)")
+	{
+		echo 'Prep failed: (' . $mysqli->errno . ') ' . $mysqli->error
     }
+    else if(!stmt->execute())
+	{
+		echo 'Execution failed: ' . $stmt->errno . ') ' . $stmt->error;
     }
+    else
+    {
+        mysqli_stmt::bind_param('i',$id);
+        $stmt->execute();
+    }
+    $stmt->close();
+}
+
+function checkInOut(array)
+{
+	if(!$stmt=$mysqli->prepare("UPDATE video_store_inventory SET rented=0 WHERE name=?"))
+	{
+		echo 'Prep failed: (' . $mysqli->errno . ') ' . $mysqli->error
+	}
+	elseif(elseif(!$stmt->bind_param("s", $id))
+	{
+		echo 'Execution failed: ' . $stmt->errno . ') ' . $stmt->error;
+	}
     else if(!stmt->execute())
     {
       echo 'Execution failed: ' . $stmt->errno . ') ' . $stmt->error;
@@ -122,5 +145,22 @@ function deleteAll(array)
     $stmt->close();
 }
  
+ 
+if(isset($_POST['add_video']))
+{
+	addMovie($_POST);
+}
+elseif(isset($_POST['delete_movie']))
+{
+	deleteMovie($_POST);
+}
+elseif(isset($_POST['delete_all']))
+{
+	deleteAll($_POST);
+}
+elseif(isset($_POST['check_in_out']))
+{
+	checkInOut($_POST);
+}
  
 ?>
