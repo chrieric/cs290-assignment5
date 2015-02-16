@@ -16,11 +16,12 @@ if($mysqli->connect_errno)
 function addMovie($array)
 { 
 	global $mysqli;
+	global $failure;
 	$name=$array["name"];
 	$category=$array["category"];
 	$length=$array["length"];
     
-    if($name !=null && $category != null && $length != null)
+    if($name !=null && $category != null && ($length != null && is_numeric($length)))
     {
           /*this is where you add functionality to add the data to the table via SQL call
           include button creation here as well?*/
@@ -42,18 +43,23 @@ function addMovie($array)
     }
     else
     {
+		$failure=1;
         if($name==null)
         {
-			echo 'You failed to enter a name';
+			echo 'You failed to enter a name! <br>';
         }
         if($category==null)
         {
-			echo 'You failed to enter a category';
+			echo 'You failed to enter a category! <br>';
         }
 		if($length==null)
         {
-			echo 'You failed to enter a movie length';
+			echo 'You failed to enter a movie length! <br>';
         }
+		if(!(is_numeric($length)))
+		{
+			echo 'You failed to enter a number for movie length! <br>';
+		}
 		
 		echo "Error while adding video, click <a href='front_page.php'>here</a> to return to your inventory.";
     }
@@ -162,13 +168,34 @@ function checkInOut($array)
 				echo 'Execution failed: ' . $stmt->errno . ') ' . $stmt->error;
 			}
 		}
-		else
+		/*else
 		{
 			echo 'Error, error, error!';
-		}
+		}*/
 	}
 	$stmt->close();
 };
+
+/*original idea from http://www.phpro.org/tutorials/Dropdown-Select-With-PHP-and-MySQL.html
+though I modified it to better fit the nees of this assignment*/
+function dropDown($id,array $options)
+{
+	$drop='<select name="'.$id.'">'."\n";
+	$len=count($options);
+	
+	$drop.='<option value="Default">Default</option>'."\n";
+	
+	for($i=0;$i<$len;$i++)
+	{	
+		$drop.= '<option value="'.$options[$i].'">'.$options[$i].'</option>'."\n";
+	}
+	
+	$drop.='</select>'."\n";
+	
+	return $drop;
+}
+
+
 
 if(isset($_POST['add_video']))
 {
@@ -185,9 +212,7 @@ elseif(isset($_POST['delete_movie']))
 	if($failure==0)
 	{
 		header("Location:front_page.php",true);
-	}
-	
-	
+	}	
 }
 elseif(isset($_POST['delete_all']))
 {
@@ -200,6 +225,15 @@ elseif(isset($_POST['delete_all']))
 elseif(isset($_POST['check_in_out']))
 {
 	checkInOut($_POST);
+		
+	if($failure==0)
+	{
+		header("Location:front_page.php",true);
+	}
+}
+elseif(isset($_POST['dropsort']))
+{
+	$_SESSION['dropdown']=$_POST['dropdown'];
 		
 	if($failure==0)
 	{

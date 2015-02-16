@@ -27,15 +27,34 @@ if($mysqli->connect_errno)
 		<p>Name:<input type='text' name='name'></p>
         <p>Category:<input type='text' name='category'></p>
         <p>Length:<input type='text' name='length'></p>
-        <input type='submit' name='add_video' value='Add'>
+        <input type='submit' name='add_video' value='Add Video'>
     </form>
 	
 	
 <?php
-	if(!($stmt=$mysqli->query("SELECT id, name, category, length, rented FROM video_store_inventory")))
+	
+	if(!(isset($_SESSION['dropdown']))||$_SESSION['dropdown']=='Default')
 	{
-		echo "Query failed: (" .  $mysqli->errno . ") ". $mysqli->error;
+		if(!($stmt=$mysqli->query("SELECT id, name, category, length, rented FROM video_store_inventory")))
+		{
+			echo "Query failed: (" .  $mysqli->errno . ") ". $mysqli->error;
+		}
 	}
+	else
+	{
+		$category=$_SESSION['dropdown'];
+		
+		if(!($stmt=$mysqli->query("SELECT id, name, category, length, rented FROM video_store_inventory WHERE category='$category'")))
+		{
+			echo "Query failed: (" .  $mysqli->errno . ") ". $mysqli->error;
+		}
+		
+	}
+	$_SESSION['dropdown']='Default';
+	
+
+	
+	
 ?>
 	
 	
@@ -44,7 +63,7 @@ if($mysqli->connect_errno)
 	<tr>
 		<th>Title</th>
 		<th>Category</th>
-		<th>Length</th>
+		<th>Length(In Min)</th>
 		<th>Rented</th>
 		<th>Check-In/Out</th>
 		<th>Delete Movie</th>
@@ -52,6 +71,9 @@ if($mysqli->connect_errno)
 	</thead>
 	<tbody>
 <?php
+	$curr_categories=array();
+	
+	
 	$row;
 	
 	while($row = mysqli_fetch_array($stmt))
@@ -84,6 +106,25 @@ if($mysqli->connect_errno)
 		echo "</td>";
 		echo "</tr>";
 	}
+	
+	if (!$stmt = $mysqli->query("SELECT category FROM video_store_inventory")) 
+	{
+		echo "Query Failed!: (" . $mysqli->errno . ") ". $mysqli->error;
+	}
+	
+	while($row = mysqli_fetch_array($stmt))
+	{
+		if(!(in_array($row['category'], $curr_categories)))
+		{
+			array_push($curr_categories,$row['category']);
+		}	
+	}
+	
+	echo "<form action='QueryFunctions.php' method='post'>";
+	echo dropDown('dropdown',$curr_categories);
+	echo "<input type='submit' name='dropsort' value='Sort'>";
+	echo "</form>";
+	
 ?>
 	</tbody>
 	</table>
