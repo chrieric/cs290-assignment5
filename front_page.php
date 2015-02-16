@@ -1,37 +1,45 @@
 <?php
-session_start();
 ob_start();
+session_start();
+include 'QueryFunctions.php';
 error_reporting(E_ALL);
 ini_set('display_errors',1);
-header('Content-Type: text/plain');
 
-$mysqli=new mysqli('oniddb.cws.oregonstate.edu','chrieric-db','temp','chrieric-db');
-if(!$mysqli||$mysqli->connect_errno)
+$mysqli=new mysqli('oniddb.cws.oregonstate.edu','chrieric-db','KpqdL049GgphILrs','chrieric-db');
+if($mysqli->connect_errno)
 {
   echo 'Connection error ' . $mysqli->connect_errno . '' . $mysqli->connect_error;
 } 
 
 ?>	
-
 <!DOCTYPE html>
 <html lang='en'>
-<meta charset='utf-8'>
 <head>
 	<title>Video Rental</title>
 </head>
 <body>
     <section>
-
+	
+	<form action='QueryFunctions.php' method='post'>
+	<input type='submit' name='delete_all' value='Delete All'>
+	</form>
     <form action='QueryFunctions.php' method='post'>
-        <input type='button' name='delete_all' value='Delete All'>
-		<input type='text' name='name'>
-        <input type='text' name='category'>
-        <input type='text' name='length'>
+		<p>Name:<input type='text' name='name'></p>
+        <p>Category:<input type='text' name='category'></p>
+        <p>Length:<input type='text' name='length'></p>
         <input type='submit' name='add_video' value='Add'>
     </form>
 	
 	
-	<table border='0.5'>
+<?php
+	if(!($stmt=$mysqli->query("SELECT id, name, category, length, rented FROM video_store_inventory")))
+	{
+		echo "Query failed: (" .  $mysqli->errno . ") ". $mysqli->error;
+	}
+?>
+	
+	
+	<table border='1'>
 	<thead>
 	<tr>
 		<th>Title</th>
@@ -46,7 +54,7 @@ if(!$mysqli||$mysqli->connect_errno)
 <?php
 	$row;
 	
-	while($row=mysqli_fetch_array($stmt))
+	while($row = mysqli_fetch_array($stmt))
 	{
 		echo "<tr>";
 		echo "<td>" . $row['name'] . "</td>";
@@ -63,16 +71,22 @@ if(!$mysqli||$mysqli->connect_errno)
 		echo "<td>" . $row['rented'] . "</td>";
 		echo "<td>";
 		echo "<form action='QueryFunctions.php' method='post'>";
-		echo "<input type='submit' name='check_in_out' value='Check In/Out' id='$row['id']'>";
+		echo "<input type='hidden' name='id' value=\"".$row['id']."\">";
+		echo "<input type='submit' name='check_in_out' value='Check In/Out'>";
+		echo "</form>";
 		echo "</td>";
 		
 		echo "<td>";
 		echo "<form action='QueryFunctions.php' method='post'>";
-		echo "<input type='submit' name='delete_movie' value='delete' id='$row['id']'>";
+		echo "<input type='hidden' name='id' value=\"".$row['id']."\">";
+		echo "<input type='submit' name='delete_movie' value='Delete'>";
+		echo "</form>";
 		echo "</td>";
+		echo "</tr>";
 	}
 ?>
-	
+	</tbody>
+	</table>
     </section>
 </body>
 </html>
