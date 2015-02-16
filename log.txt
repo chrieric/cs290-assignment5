@@ -5,3 +5,14 @@ Tasks: Initial Commit
 Start: Sun, 15 Feb 2015 01:51:24 -0600
 End: Sun, 15 Feb 2015 02:21:41 -0600
 Tasks: Q 1 created
+
+Start: Sun, 15 Feb 2015 15:33:20 -0600
+End: Sun, 15 Feb 2015 23:33:29 -0600
+Tasks: Q 2 
+
+Start: Sun, 15 Feb 2015 23:33:29 -0600
+End: Mon, 16 Feb 2015 03:44:48	-0600
+Task: Q 3
+
+Start:Mon, 16 Feb 2015 03:44:48 -0600
+End: Mon, 16 Feb 2015 03:51:10 -600
